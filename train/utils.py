@@ -6,7 +6,7 @@ import numpy as np
 import re
 
 DATASET = 'aisquared/databricks-dolly-15k'
-MODEL_ID = 'gpt2'
+MODEL_ID = 'EleutherAI/gpt-neo-125m'
 END_KEY = '### End'
 INSTRUCTION_KEY = '### Instruction:'
 RESPONSE_KEY = '### Response:\n'
@@ -97,7 +97,8 @@ class DataCollatorForCompletionOnlyLM(DataCollatorForLanguageModeling):
             try:
                 labels[i, :res_tok_id_start_idx + 1] = -100
             except:
-                pass
+                # No response token found, make all values -100
+                labels[i, :] = -100
 
         batch['labels'] = labels
 
@@ -136,9 +137,10 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
     def create_full_text(row):
         instruction = row.instruction
         if row.context:
-            instruction += f'\n{row.context}'
+            instruction += f'\n\n{row.context}'
         prompt = PROMPT.format(instruction = instruction)
         prompt += row.response
+        prompt += f'\n\n{END_KEY}'
         return prompt
     
     dataset['text'] = dataset.apply(create_full_text, axis = 1)
@@ -152,12 +154,6 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
 
 
     dataset = dataset.filter(lambda rec : not rec['text'].strip().endswith(RESPONSE_KEY.strip()))
-
-    def _func(rec):
-        rec['text'] += f'\n\n{END_KEY}'
-        return rec
-
-    dataset = dataset.map(_func)
 
     _preproc_func = partial(preprocess_batch, max_length = max_length, tokenizer = tokenizer)
     dataset = dataset.map(
