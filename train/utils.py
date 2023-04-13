@@ -97,7 +97,7 @@ class DataCollatorForCompletionOnlyLM(DataCollatorForLanguageModeling):
             try:
                 labels[i, :res_tok_id_start_idx + 1] = -100
             except:
-                raise Exception(f'Error with tokens {batch["labels"][i]}')
+                raise Exception(f'Error with tokens {self.tokenizer.decode(batch["labels"][i])}')
 
         batch['labels'] = labels
 
