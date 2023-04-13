@@ -1,5 +1,5 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments, set_seed
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from functools import partial
 from tqdm import tqdm
 import numpy as np
@@ -128,16 +128,18 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
     dataset = load_dataset(dataset_name)['train']
 
     # Create the 'text' column
-    full_text = []
-    for i in tqdm(range(len(dataset['instruction']))):
-        instruction = dataset['instruction'][i]
-        if dataset['context'][i]:
-            instruction += f'\n{dataset["context"][i]}'
+    dataset = dataset.to_pandas()
+
+    def create_full_text(row):
+        instruction = row.instruction
+        if row.context:
+            instruction += f'\n{row.context}'
         prompt = PROMPT.format(instruction = instruction)
-        prompt += dataset['response'][i]
-        full_text.append(prompt)
+        prompt += row.response
+        return prompt
     
-    dataset = dataset.add_column('text', full_text)
+    dataset['text'] = dataset.apply(create_full_text, axis = 1)
+    dataset = Dataset.from_pandas(dataset)
 
     for i in range(5):
         print(dataset['text'][i])
