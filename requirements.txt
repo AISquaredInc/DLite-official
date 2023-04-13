@@ -1,0 +1,4 @@
+accelerate>=0.12.0
+click==8.0.3
+datasets==2.8.0
+transformers[torch]==4.25.1
