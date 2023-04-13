@@ -134,7 +134,7 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
         if dataset['context'][i]:
             instruction += f'\n{dataset["context"][i]}'
         prompt = PROMPT.format(instruction = instruction)
-        prompt += dataset['response'][i] + '\n\n' + END_KEY
+        prompt += dataset['response'][i]
         full_text.append(prompt)
     
     dataset = dataset.add_column('text', full_text)
