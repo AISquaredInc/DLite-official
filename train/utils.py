@@ -94,11 +94,8 @@ class DataCollatorForCompletionOnlyLM(DataCollatorForLanguageModeling):
             for idx in np.where(batch['labels'][i] == res_tok_id[0])[0]:
                 res_tok_id_start_idx = idx
                 break
-            try:
-                labels[i, :res_tok_id_start_idx + 1] = -100
-            except:
-                # No response token found, make all values -100
-                labels[i, :] = -100
+
+            labels[i, :res_tok_id_start_idx + 1] = -100
 
         batch['labels'] = labels
 
