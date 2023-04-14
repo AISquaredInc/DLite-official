@@ -9,8 +9,19 @@ DATASET = 'aisquared/databricks-dolly-15k'
 MODEL_ID = 'EleutherAI/gpt-neo-125m'
 END_KEY = '### End'
 INSTRUCTION_KEY = '### Instruction:'
+INPUT_KEY = '### Input:'
 RESPONSE_KEY = '### Response:\n'
 SEED = 42
+
+PROMPT_WITH_INPUT = """The following is an instruction that describes a task, paired with an input that provides further context. Write a response that completes this task.
+
+%s
+{instruction}
+
+%s
+{input}
+
+%s""" % (INSTRUCTION_KEY, INPUT_KEY, RESPONSE_KEY)
 
 PROMPT = """The following is an instruction that describes a task. Write a response that appropriately completes the request.
 
@@ -95,7 +106,8 @@ class DataCollatorForCompletionOnlyLM(DataCollatorForLanguageModeling):
                 res_tok_id_start_idx = idx
                 break
 
-            labels[i, :res_tok_id_start_idx + 1] = -100
+            if res_tok_id_start_idx:
+                labels[i, :res_tok_id_start_idx + 1] = -100
 
         batch['labels'] = labels
 
@@ -134,8 +146,9 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
     def create_full_text(row):
         instruction = row.instruction
         if row.context:
-            instruction += f'\n\n{row.context}'
-        prompt = PROMPT.format(instruction = instruction)
+            prompt = PROMPT_WITH_INPUT.format(instruction = instruction, input = row.context)
+        else:
+            prompt = PROMPT.format(instruction = instruction)
         prompt += row.response
         prompt += f'\n\n{END_KEY}'
         return prompt
