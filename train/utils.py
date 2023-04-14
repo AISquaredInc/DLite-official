@@ -6,7 +6,7 @@ import numpy as np
 import re
 
 DATASET = 'aisquared/databricks-dolly-15k'
-MODEL_ID = 'EleutherAI/gpt-neo-125m'
+MODEL_ID = 'gpt2'
 END_KEY = '### End'
 INSTRUCTION_KEY = '### Instruction:'
 INPUT_KEY = '### Input:'
