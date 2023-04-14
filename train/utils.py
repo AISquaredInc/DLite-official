@@ -154,6 +154,11 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
         return prompt
     
     dataset['text'] = dataset.apply(create_full_text, axis = 1)
+
+    # Filter out prompts that are too long
+    text_lengths = dataset.text.apply(lambda s : len(tokenizer(s)['input_ids']))
+    dataset = dataset[text_lengths <= max_length].reset_index(drop = True)
+
     dataset = Dataset.from_pandas(dataset)
 
     for i in range(5):
