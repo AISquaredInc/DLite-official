@@ -189,9 +189,9 @@ def train(
         seed,
         gradient_checkpointing,
         cuda,
+        deepspeed,
         test_size = 1000,
-        model_id = MODEL_ID,
-        fsdp = True
+        model_id = MODEL_ID
 ):
     """
     Train DLite
@@ -232,7 +232,7 @@ def train(
         disable_tqdm = True,
         remove_unused_columns = False,
         no_cuda = not cuda,
-        fsdp = fsdp
+        deepspeed = deepspeed
     )
 
     trainer = Trainer(
