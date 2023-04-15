@@ -191,7 +191,8 @@ def train(
         cuda,
         deepspeed,
         test_size = 1000,
-        model_id = MODEL_ID
+        model_id = MODEL_ID,
+        local_rank = None
 ):
     """
     Train DLite
@@ -232,7 +233,8 @@ def train(
         disable_tqdm = True,
         remove_unused_columns = False,
         no_cuda = not cuda,
-        deepspeed = deepspeed
+        deepspeed = deepspeed,
+        local_rank = local_rank
     )
 
     trainer = Trainer(
