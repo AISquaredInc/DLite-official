@@ -10,7 +10,6 @@ import click
 @click.option('--seed', type = int, default = SEED)
 @click.option('--gradient-checkpointing/--no-gradient-checkpointing', default = True)
 @click.option('--cuda/--no-cuda', default = True)
-@click.option('--fsdp/--no-fsdp', default = True)
 @click.option('--model-id', '-m', type = str, default = MODEL_ID)
 @click.option('--deepspeed', type = click.Path(exists = True, file_okay = True, dir_okay = False), default = None)
 @click.option('--local_rank', default = None)
