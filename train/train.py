@@ -24,7 +24,8 @@ def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, 
         gradient_checkpointing = gradient_checkpointing,
         cuda = cuda,
         model_id = model_id,
-        deepspeed = deepspeed
+        deepspeed = deepspeed,
+        local_rank = local_rank
     )
 
 if __name__ == '__main__':
