@@ -13,7 +13,8 @@ import click
 @click.option('--fsdp/--no-fsdp', default = True)
 @click.option('--model-id', '-m', type = str, default = MODEL_ID)
 @click.option('--deepspeed', type = click.Path(exists = True, file_okay = True, dir_okay = False), default = None)
-def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed):
+@click.option('--local_rank', default = None)
+def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank):
     train(
         local_output_dir = local_output_dir,
         epochs = epochs,
@@ -23,7 +24,8 @@ def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, 
         seed = seed,
         gradient_checkpointing = gradient_checkpointing,
         cuda = cuda,
-        model_id = model_id
+        model_id = model_id,
+        deepspeed = deepspeed
     )
 
 if __name__ == '__main__':
