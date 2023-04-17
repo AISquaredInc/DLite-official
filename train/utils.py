@@ -40,7 +40,8 @@ def load_model_and_tokenizer(location):
     )
     tokenizer = AutoTokenizer.from_pretrained(
         location,
-        trust_remote_code = True
+        trust_remote_code = True,
+        use_fast = False
     )
     return model, tokenizer
 
@@ -118,7 +119,7 @@ def get_model_and_tokenizer(model_id = MODEL_ID, gradient_checkpointing = False)
     Get the pretrained model and tokenizer
     """
     model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code = True, use_cache = False if gradient_checkpointing else True)
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast = False)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.add_special_tokens({'additional_special_tokens' : [END_KEY, INSTRUCTION_KEY, RESPONSE_KEY]})
     model.resize_token_embeddings(len(tokenizer))
