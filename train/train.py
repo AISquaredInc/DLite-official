@@ -1,4 +1,4 @@
-from utils import train, SEED, MODEL_ID, DEFAULT_MAX_LENGTH
+from utils import train, SEED, MODEL_ID, DEFAULT_MAX_LENGTH, DATASET
 import click
 
 @click.command()
@@ -15,7 +15,8 @@ import click
 @click.option('--local_rank', default = True)
 @click.option('--fp16/--no-fp16', default = False)
 @click.option('--max-length', type = int, default = DEFAULT_MAX_LENGTH)
-def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16, max_length):
+@click.option('--dataset', type = str, default = DATASET)
+def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16, max_length, dataset):
     train(
         local_output_dir = local_output_dir,
         epochs = epochs,
@@ -29,7 +30,8 @@ def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, 
         deepspeed = deepspeed,
         local_rank = local_rank,
         fp16 = fp16,
-        max_length = max_length
+        max_length = max_length,
+        dataset = dataset
     )
 
 if __name__ == '__main__':

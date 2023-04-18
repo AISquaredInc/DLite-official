@@ -142,43 +142,55 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
     """
     dataset = load_dataset(dataset_name)['train']
 
-    # Create the 'text' column
-    dataset = dataset.to_pandas()
-
-    def create_full_text(row):
-        instruction = row.instruction
-        if row.context:
-            prompt = PROMPT_WITH_INPUT.format(instruction = instruction, input = row.context)
-        else:
-            prompt = PROMPT.format(instruction = instruction)
-        prompt += row.response
-        prompt += f'\n\n{END_KEY}'
-        return prompt
-    
-    dataset['text'] = dataset.apply(create_full_text, axis = 1)
-
-    # Filter out prompts that are too long
-    text_lengths = dataset.text.apply(lambda s : len(tokenizer(s)['input_ids']))
-    dataset = dataset[text_lengths <= max_length].reset_index(drop = True)
-
-    dataset = Dataset.from_pandas(dataset)
-
-    for i in range(5):
-        print(dataset['text'][i])
-        print('\n\n')
-        print('-'*20)
-        print('\n\n')
-
-
-    dataset = dataset.filter(lambda rec : not rec['text'].strip().endswith(RESPONSE_KEY.strip()))
-
     _preproc_func = partial(preprocess_batch, max_length = max_length, tokenizer = tokenizer)
-    dataset = dataset.map(
-        _preproc_func,
-        batched = True,
-        remove_columns = ['instruction', 'context', 'response', 'category', 'text']
-    )
 
+    # If training off of the dolly-15k dataset
+    if dataset_name == 'aisquared/databricks-dolly-15k':
+        # Create the 'text' column
+        dataset = dataset.to_pandas()
+
+        def create_full_text(row):
+            instruction = row.instruction
+            if row.context:
+                prompt = PROMPT_WITH_INPUT.format(instruction = instruction, input = row.context)
+            else:
+                prompt = PROMPT.format(instruction = instruction)
+            prompt += row.response
+            prompt += f'\n\n{END_KEY}'
+            return prompt
+    
+        dataset['text'] = dataset.apply(create_full_text, axis = 1)
+
+        # Filter out prompts that are too long
+        text_lengths = dataset.text.apply(lambda s : len(tokenizer(s)['input_ids']))
+        dataset = dataset[text_lengths <= max_length].reset_index(drop = True)
+
+        dataset = Dataset.from_pandas(dataset)
+        dataset = dataset.map(
+            _preproc_func,
+            batched = True,
+            remove_columns = ['instruction', 'context', 'response', 'category', 'text']
+        )
+    
+    # If training off of the alpaca dataset
+    elif dataset_name == 'tatsu-lab/alpaca':
+        dataset = dataset.filter(lambda rec : not rec['text'].strip().endswith(RESPONSE_KEY.strip()))
+
+        def _func(rec):
+            rec['text'] += f'\n\n{END_KEY}'
+            return rec
+        
+        dataset = dataset.map(_func)
+        dataset = dataset.map(
+            _preproc_func,
+            batched = True,
+            remove_columns = ['instruction', 'input', 'output', 'text']
+        )
+
+    else:
+        raise ValueError(f'Got unsupported dataset: {dataset_name}')
+
+    dataset = dataset.filter(lambda rec : not rec['text'].strip().endswith(RESPONSE_KEY.strip()))    
     dataset = dataset.shuffle(seed = seed)
     return dataset
 
@@ -196,7 +208,8 @@ def train(
         model_id = MODEL_ID,
         local_rank = None,
         fp16 = False,
-        max_length = DEFAULT_MAX_LENGTH
+        max_length = DEFAULT_MAX_LENGTH,
+        dataset = DATASET
 ):
     """
     Train DLite
@@ -207,7 +220,7 @@ def train(
     conf = model.config
     max_length = getattr(conf, 'n_positions', getattr(conf, 'seq_length', max_length))
 
-    processed_dataset = preprocess_dataset(tokenizer, max_length)
+    processed_dataset = preprocess_dataset(tokenizer, max_length, dataset_name = dataset)
     split_dataset = processed_dataset.train_test_split(test_size = test_size, seed = seed)
 
     data_collator = DataCollatorForCompletionOnlyLM(
