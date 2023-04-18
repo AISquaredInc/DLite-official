@@ -229,7 +229,7 @@ def train(
         eval_steps = 100,
         save_strategy = 'steps',
         save_steps = 200,
-        save_total_limit = 1,
+        save_total_limit = None,
         load_best_model_at_end = True,
         report_to = 'tensorboard',
         disable_tqdm = True,
