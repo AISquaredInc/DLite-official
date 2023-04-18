@@ -190,7 +190,6 @@ def preprocess_dataset(tokenizer, max_length, dataset_name = DATASET, seed = SEE
     else:
         raise ValueError(f'Got unsupported dataset: {dataset_name}')
 
-    dataset = dataset.filter(lambda rec : not rec['text'].strip().endswith(RESPONSE_KEY.strip()))    
     dataset = dataset.shuffle(seed = seed)
     return dataset
 
