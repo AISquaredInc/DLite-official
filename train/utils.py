@@ -12,6 +12,7 @@ INSTRUCTION_KEY = '### Instruction:'
 INPUT_KEY = '### Input:'
 RESPONSE_KEY = '### Response:\n'
 SEED = 42
+DEFAULT_MAX_LENGTH = 1024
 
 PROMPT_WITH_INPUT = """The following is an instruction that describes a task, paired with an input that provides further context. Write a response that completes this task.
 
@@ -125,7 +126,7 @@ def get_model_and_tokenizer(model_id = MODEL_ID, gradient_checkpointing = False)
     model.resize_token_embeddings(len(tokenizer))
     return model, tokenizer
 
-def preprocess_batch(batch, tokenizer, max_length):
+def preprocess_batch(batch, tokenizer, max_length = DEFAULT_MAX_LENGTH):
     """
     Preprocess a batch of the dataset
     """
@@ -194,7 +195,8 @@ def train(
         test_size = 1000,
         model_id = MODEL_ID,
         local_rank = None,
-        fp16 = False
+        fp16 = False,
+        max_length = DEFAULT_MAX_LENGTH
 ):
     """
     Train DLite
@@ -203,7 +205,7 @@ def train(
 
     model, tokenizer = get_model_and_tokenizer(model_id = model_id, gradient_checkpointing = gradient_checkpointing)
     conf = model.config
-    max_length = getattr(conf, 'n_positions', getattr(conf, 'seq_length', 1024))
+    max_length = getattr(conf, 'n_positions', getattr(conf, 'seq_length', max_length))
 
     processed_dataset = preprocess_dataset(tokenizer, max_length)
     split_dataset = processed_dataset.train_test_split(test_size = test_size, seed = seed)
@@ -232,7 +234,7 @@ def train(
         save_total_limit = None,
         load_best_model_at_end = True,
         report_to = 'tensorboard',
-        disable_tqdm = True,
+        disable_tqdm = False,
         remove_unused_columns = False,
         no_cuda = not cuda,
         deepspeed = deepspeed,

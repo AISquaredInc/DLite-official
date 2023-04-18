@@ -1,4 +1,4 @@
-from utils import train, SEED, MODEL_ID
+from utils import train, SEED, MODEL_ID, DEFAULT_MAX_LENGTH
 import click
 
 @click.command()
@@ -14,7 +14,8 @@ import click
 @click.option('--deepspeed', type = click.Path(exists = True, file_okay = True, dir_okay = False), default = None)
 @click.option('--local_rank', default = True)
 @click.option('--fp16/--no-fp16', default = False)
-def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16):
+@click.option('--max-length', type = int, default = DEFAULT_MAX_LENGTH)
+def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16, max_length):
     train(
         local_output_dir = local_output_dir,
         epochs = epochs,
@@ -27,7 +28,8 @@ def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, 
         model_id = model_id,
         deepspeed = deepspeed,
         local_rank = local_rank,
-        fp16 = fp16
+        fp16 = fp16,
+        max_length = max_length
     )
 
 if __name__ == '__main__':
