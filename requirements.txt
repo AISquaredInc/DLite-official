@@ -3,3 +3,4 @@ click==8.0.3
 datasets==2.8.0
 transformers[torch]==4.25.1
 deepspeed==0.8.0
+mlflow==2.3.0
