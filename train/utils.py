@@ -208,7 +208,8 @@ def train(
         local_rank = None,
         fp16 = False,
         max_length = DEFAULT_MAX_LENGTH,
-        dataset = DATASET
+        dataset = DATASET,
+        load_best = True
 ):
     """
     Train DLite
@@ -244,7 +245,7 @@ def train(
         save_strategy = 'steps',
         save_steps = 200,
         save_total_limit = None,
-        load_best_model_at_end = True,
+        load_best_model_at_end = load_best,
         report_to = 'tensorboard',
         disable_tqdm = False,
         remove_unused_columns = False,

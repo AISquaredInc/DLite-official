@@ -16,7 +16,8 @@ import click
 @click.option('--fp16/--no-fp16', default = False)
 @click.option('--max-length', type = int, default = DEFAULT_MAX_LENGTH)
 @click.option('--dataset', type = str, default = DATASET)
-def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16, max_length, dataset):
+@click.option('--load-best/--no-load-best', default = True)
+def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, gradient_checkpointing, cuda, model_id, deepspeed, local_rank, fp16, max_length, dataset, load_best):
     train(
         local_output_dir = local_output_dir,
         epochs = epochs,
@@ -31,7 +32,8 @@ def main(local_output_dir, epochs, train_batch_size, eval_batch_size, lr, seed, 
         local_rank = local_rank,
         fp16 = fp16,
         max_length = max_length,
-        dataset = dataset
+        dataset = dataset,
+        load_best = load_best
     )
 
 if __name__ == '__main__':
