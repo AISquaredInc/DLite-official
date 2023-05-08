@@ -9,27 +9,26 @@ DATASET = 'aisquared/databricks-dolly-15k'
 MODEL_ID = 'gpt2'
 END_KEY = '### End'
 INSTRUCTION_KEY = '### Instruction:'
-INPUT_KEY = '### Input:'
 RESPONSE_KEY = '### Response:\n'
 SEED = 42
 DEFAULT_MAX_LENGTH = 1024
+PROMPT_SEED = 'The following is an instruction that describes a task, along with any additional context. Write a response that appropriately completes the request.'
 
-PROMPT_WITH_INPUT = """The following is an instruction that describes a task, paired with an input that provides further context. Write a response that completes this task.
+PROMPT_WITH_INPUT = """%s
 
 %s
 {instruction}
 
-%s
 {input}
 
-%s""" % (INSTRUCTION_KEY, INPUT_KEY, RESPONSE_KEY)
+%s""" % (PROMPT_SEED, INSTRUCTION_KEY, RESPONSE_KEY)
 
-PROMPT = """The following is an instruction that describes a task. Write a response that appropriately completes the request.
+PROMPT = """%s
 
 %s
 {instruction}
 
-%s""" % (INSTRUCTION_KEY, RESPONSE_KEY)
+%s""" % (PROMPT_SEED, INSTRUCTION_KEY, RESPONSE_KEY)
 
 def load_model_and_tokenizer(location):
     """
